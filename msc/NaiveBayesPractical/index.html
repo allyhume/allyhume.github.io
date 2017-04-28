@@ -1,0 +1,418 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Bayes Classifier Practical &mdash; Naive Bayes Tutorial 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Naive Bayes Tutorial 1.0 documentation" href="#" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">Naive Bayes Tutorial 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="bayes-classifier-practical">
+<h1>Bayes Classifier Practical<a class="headerlink" href="#bayes-classifier-practical" title="Permalink to this headline">¶</a></h1>
+<p>This practical will explore writing a Naive Bayes classifier in R.</p>
+<div class="section" id="before-you-start">
+<h2>Before you start<a class="headerlink" href="#before-you-start" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="running-r-studio">
+<h3>Running R studio<a class="headerlink" href="#running-r-studio" title="Permalink to this headline">¶</a></h3>
+<p>This practical uses R studio. Ensure that you can run R Studio.</p>
+</div>
+<div class="section" id="installing-the-packages">
+<h3>Installing the packages<a class="headerlink" href="#installing-the-packages" title="Permalink to this headline">¶</a></h3>
+<p>The practical will use a number of R packages. Before you use these packages you need to load them:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">library</span><span class="p">(</span><span class="n">doBy</span><span class="p">)</span>
+<span class="n">library</span><span class="p">(</span><span class="n">ROCR</span><span class="p">)</span>
+<span class="n">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
+<span class="n">library</span><span class="p">(</span><span class="n">plyr</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>What do these packages do?</dt>
+<dd><ul class="first last simple">
+<li>doBy - used to produce data grouped by a feature.</li>
+<li>ROCR - used to produce receiver operator characteristic (ROC) curves</li>
+<li>ggplot2 - graph plotting</li>
+<li>plyr - tools for splitting, applying and combining data</li>
+</ul>
+</dd>
+</dl>
+<p>If any of these packages fail to load then you can install them with the commands below. Please do not
+do this unless you have to as R does not check if they exist before downloading the packages and it will
+take a while to install them:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s">&quot;doBy&quot;</span><span class="p">)</span>
+<span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s">&quot;ROCR&quot;</span><span class="p">)</span>
+<span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s">&quot;ggplot2&quot;</span><span class="p">)</span>
+<span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s">&quot;plyr&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="downloading-the-files">
+<h3>Downloading the files<a class="headerlink" href="#downloading-the-files" title="Permalink to this headline">¶</a></h3>
+<p>Download the practical R files and data using git:</p>
+<div class="highlight-python"><div class="highlight"><pre>git clone https://allyhume@bitbucket.org/allyhume/NaiveBayesClassifierPractical.git
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="the-data-set">
+<h2>The data set<a class="headerlink" href="#the-data-set" title="Permalink to this headline">¶</a></h2>
+<p>The data set we will use for this practical is the <a class="reference external" href="https://archive.ics.uci.edu/ml/datasets/Adult">Adult data set</a> from the UCI Machine Learning
+Repository. This data set can be build a classifier that predicts if adult Americans have an
+annual salary of less than or equal to $50,000 (&lt;=50K) or above $50,000 (&gt;50K).</p>
+<p>Look at the website for the <a class="reference external" href="https://archive.ics.uci.edu/ml/datasets/Adult">Adult data set</a> to understand it more.  You will see that it has
+both continuous and categorical features. This practical will build a Naive Bayes classifier that
+uses both these types of features.</p>
+<p>Set your R working directory to be the tutorial&#8217;s R directory:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">setwd</span><span class="p">(</span><span class="s">&quot;/PATH/TO/NaiveBayesClassifierPractical/R&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The training and test data frames can be loaded using:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">source</span><span class="p">(</span><span class="s">&quot;loadData.R&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The training data frame is called <code class="docutils literal"><span class="pre">training</span></code> and the test data frame is called <code class="docutils literal"><span class="pre">test</span></code>.</p>
+<p>Use the summary function to see quick summary of the data:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">summary</span><span class="p">(</span><span class="n">training</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You will notice that some of the data features are categorical and some are continuous.</p>
+<p>Notice also that the salary class in the training set is heavily biased towards &lt;=50K.</p>
+<p>Spend a few minutes further understanding the data.</p>
+</div>
+<div class="section" id="naive-bayes-classifier">
+<h2>Naive Bayes Classifier<a class="headerlink" href="#naive-bayes-classifier" title="Permalink to this headline">¶</a></h2>
+<p>Recall that to implement a Naive Bayes Classifier we wish to use the following
+equation for each class to determine which class has highest probability of
+occurring given the feature data:</p>
+<a class="reference internal image-reference" href="_images/pClassGivenData.png"><img alt="_images/pClassGivenData.png" src="_images/pClassGivenData.png" style="width: 300px;" /></a>
+<p>So first we need to determine the a priori probability of each class occurring. Assuming our
+training set is representative then this is easily done. The <code class="docutils literal"><span class="pre">table</span></code> function in
+R will be useful here:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">table</span><span class="p">(</span><span class="n">training</span><span class="p">[[</span><span class="s">&quot;salary&quot;</span><span class="p">]])</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>What is the a priori probability of class &#8216;&lt;=50&#8217;?</dt>
+<dd></dd>
+<dt>What is the a priori probability of class &#8216;&gt;50K&#8217;?</dt>
+<dd></dd>
+</dl>
+<p>Next we need to consider the feature data. Let&#8217;s start with the education feature.  Again
+we can use R&#8217;s <code class="docutils literal"><span class="pre">table</span></code> function to obtain the data we need:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">table</span><span class="p">(</span><span class="n">training</span><span class="p">[[</span><span class="s">&quot;education&quot;</span><span class="p">]],</span> <span class="n">training</span><span class="p">[[</span><span class="s">&quot;salary&quot;</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>This is the data we need to compute the probability of seeing the various feature values
+for each class.</p>
+<p>Look at the code in classifier1.R and complete the function so that it uses the education
+feature value when computing the score for each class.</p>
+<p>Test the function to ensure it produces the following results for training set instances
+1 and 6:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; source(&#39;classifier1.R&#39;)
+&gt; classifier1(training[1,], printScores=TRUE)
+[1] &quot;&lt;=50K: 0.0962501151684531 &gt;50K: 0.0682104357974264&quot;
+[1] &lt;=50K
+Levels: &lt;=50K &gt;50K
+&gt; classifier1(training[6,], printScores=TRUE)
+[1] &quot;&lt;=50K: 0.0234636528362151 &gt;50K: 0.0294524123951967&quot;
+[1] &gt;50K
+Levels: &lt;=50K &gt;50K
+</pre></div>
+</div>
+<p>Now we can apply the classifier to the whole test set and analyse the result:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; predictions &lt;- apply(test, 1, classifier1)
+&gt; table(predictions, test[,&quot;salary&quot;], dnn=list(&quot;predicted&quot;, &quot;actual&quot;))
+         actual
+predicted &lt;=50K  &gt;50K
+    &lt;=50K 11881  3027
+    &gt;50K    554   819
+</pre></div>
+</div>
+<p>Here we have applied the classifier to all the test examples and produced a confusion matrix.</p>
+<p>If we consider &gt;50K to the positive then the true positive rate is 819/(3027+819) = 21.3% and the false
+positive rate is 554/(11881+554) = 4.5%. This seems a very low true positive rate. Maybe using more
+features will improve matters.</p>
+<p>Edit the <code class="docutils literal"><span class="pre">classifier1</span></code> function to that it now includes the workclass feature. When completed you
+should see the following values for instances 1 and 6:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; source(&#39;classifier1.R&#39;)
+&gt; classifier1(training[1,], printScores=TRUE)
+[1] &quot;&lt;=50K: 0.00394177069703957 &gt;50K: 0.0031474880832015&quot;
+[1] &lt;=50K
+Levels: &lt;=50K &gt;50K
+&gt; classifier1(training[6,], printScores=TRUE)
+[1] &quot;&lt;=50K: 0.0180316773887152 &gt;50K: 0.0191074931656681&quot;
+[1] &gt;50K
+Levels: &lt;=50K &gt;50K
+</pre></div>
+</div>
+<p>Now applying this to the whole test set gives:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; predictions &lt;- apply(test, 1, classifier1)
+&gt; table(predictions, test[,&quot;salary&quot;], dnn=list(&quot;predicted&quot;, &quot;actual&quot;))
+         actual
+predicted &lt;=50K  &gt;50K
+    &lt;=50K 11764  2854
+    &gt;50K    671   992
+</pre></div>
+</div>
+<p>Is this better? We have more true positives (992 compared with 819) but we also have
+more false positives (671 compared with 554).  Our true positive rate is now 25.8% and
+our false positive rate is now 5.4%.  It is hard to tell if this is really any better.</p>
+</div>
+<div class="section" id="roc-curves">
+<h2>ROC Curves<a class="headerlink" href="#roc-curves" title="Permalink to this headline">¶</a></h2>
+<p>Choosing the best classifier requires considering a trade-off between between the true
+positive rate and the false positive rate. Our trained classifier has given as a
+single pair of true positive and false positive rates (TPR=25.8%, FPR=5.4%) but in
+fact it can support many other rate pairs if we simply adjust our sensitivity to
+predicting high salaries. We can adjust the rate simply by adding a weight to the
+score for high salaries. Let&#8217;s add a weight of 2.0 to high salaries. This should
+result in more true positives at the expense of more false positives.</p>
+<p>Add a weight of 2.0 to the high salary score and see how well the classifier works now.
+The true positive rate should now be 53.4% with a false positive rate of 18.8%.</p>
+<p>If we adjust the weight for high salary we can get get a whole range of true positive
+rates for 0.0 to 1.0 (100%). If we alter our classifier code to return the ratio of
+high salary score to low salary score then we can easily adjust the weighting after we have
+applied the score all our training examples:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Make of copy of your classifier1.R file and call it classifier2.R</li>
+<li>Remove any code you added to adjust the weight for the high salaries.</li>
+<li>Change the name of the function from <code class="docutils literal"><span class="pre">classifier1</span></code> to <code class="docutils literal"><span class="pre">classifier2</span></code>.</li>
+<li>Change the function to return <code class="docutils literal"><span class="pre">highSalaryScore/lowSalaryScore</span></code></li>
+</ul>
+</div></blockquote>
+<p>Now the threshold can be altered effectively adjust the weighting for a high
+salary.  If the threshold is 1.0 we get the same results are before:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; source(&#39;classifier2.R&#39;)
+&gt; ratios &lt;- apply(test, 1, classifier2)
+&gt; predictions &lt;- sapply(ratios, function(x) { if (x &gt;= 1.0) gt50K else lt50K})
+&gt; table(predictions, test[,&quot;salary&quot;], dnn=list(&quot;predicted&quot;, &quot;actual&quot;))
+         actual
+predicted &lt;=50K  &gt;50K
+    &lt;=50K 11764  2854
+    &gt;50K    671   992
+</pre></div>
+</div>
+<p>But if we set a lower threshold then we effectively increase the weight of
+the high salary class.  Setting a threshold of 0.5 is equivalent to a high
+salary weighting of 2.0:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; predictions &lt;- sapply(ratios, function(x) { if (x &gt;= 0.5) gt50K else lt50K})
+&gt; table(predictions, test[,&quot;salary&quot;], dnn=list(&quot;predicted&quot;, &quot;actual&quot;))
+         actual
+predicted &lt;=50K  &gt;50K
+    &lt;=50K 10100  1792
+    &gt;50K   2335  2054
+</pre></div>
+</div>
+<p>Graphs showing all the possible true positive and false positive rate combinations
+are known as receiver operating characteristic (ROC) curves. They always start in
+the bottom left corner (TPR=FPR=0) and end in the top right corner (TPR=FTP=1.0).
+Typically the closer the curve gets to the top left corner the better.</p>
+<p>The RCOC library includes functions to draw ROC curves. Use these to draw a ROC
+curve for our classifier using the library&#8217;s prediction and performance functions:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; library(ROCR)
+&gt; ratios &lt;- apply(test, 1, classifier2)
+&gt; pred &lt;- prediction(ratios, test[&quot;salary&quot;])
+&gt; perf &lt;- performance(pred,&quot;tpr&quot;,&quot;fpr&quot;)
+&gt; plot(perf)
+</pre></div>
+</div>
+<p>This curve should contain the TPR and FPR pairs identified above. Use R&#8217;s
+<code class="docutils literal"><span class="pre">abline</span></code> function to draw lines for the known TPR and FPR rates to ensure
+the intersect on the ROC curve. Use <code class="docutils literal"><span class="pre">?abline</span></code> to view the documentation
+for the <code class="docutils literal"><span class="pre">abline</span></code> function. You will wish to use the <code class="docutils literal"><span class="pre">v</span></code> and <code class="docutils literal"><span class="pre">h</span></code> parameters
+when calling <code class="docutils literal"><span class="pre">abline</span></code>.</p>
+<p>The area under the ROC curve is a useful single measure of the of how
+good the classifier is. The <code class="docutils literal"><span class="pre">performance</span></code> function can be used to return
+the area under the curve:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; performance(pred,&quot;auc&quot;)@y.values
+[[1]]
+[1] 0.7247961
+</pre></div>
+</div>
+<p>So the area under the ROC curve for a Naive Bayes classifier using
+just the education and workclass features is 0.72.</p>
+</div>
+<div class="section" id="adding-continuous-features">
+<h2>Adding continuous features<a class="headerlink" href="#adding-continuous-features" title="Permalink to this headline">¶</a></h2>
+<p>For categorical features such as the ones we have used so we can determine
+the required probability models simply by counting.  This approach does not
+work for continuous data. For continuous data we must model the data using
+a appropriate distribution.  Consider the age data in our data set. We can
+plot the density histogram of this feature for the low and high salary groups
+using the drawAgeHistograms.R script:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; source(&#39;drawAgeHistograms.R&#39;)
+</pre></div>
+</div>
+<p>You can see that there is a clear difference between the two groups although
+there is significant overlap.</p>
+<p>We wish to model this distributions using the normal distribution (also
+called the Gaussian distribution). The normal distribution is specified
+by two parameters: mean and standard deviation.</p>
+<p>Using the doBy library&#8217;s <code class="docutils literal"><span class="pre">summaryBy</span></code> function we can easily calculate the mean
+and standard deviation for the two groups:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; library(doBy)
+&gt; summaryBy(age~salary,data=training,FUN=c(mean,sd))
+</pre></div>
+</div>
+<p>To see how well the normal distributions match the data we can plot them on
+top of the data:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; source(&#39;drawAgeHistogramsWithNormalModels.R&#39;)
+</pre></div>
+</div>
+<p>The normal model fits well for the high salary group but is less good a fit
+for the low salary group. Nonetheless we will carry on with these values
+and add the age feature into our classifier.</p>
+<dl class="docutils">
+<dt>Adjust your classifier to use the age feature:</dt>
+<dd><ul class="first last">
+<li><p class="first">Use the <code class="docutils literal"><span class="pre">dnorm</span></code> function for the normal probability density function</p>
+</li>
+<li><dl class="first docutils">
+<dt>You may have to use the <code class="docutils literal"><span class="pre">as.numeric</span></code> function to convert the age to a number:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">age</span> <span class="pre">&lt;-</span> <span class="pre">as.numeric(x[[&quot;age&quot;]])</span></code></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">Do not worry about storing the results from the <code class="docutils literal"><span class="pre">summaryBy</span></code> function and
+indexing them in your code.  Feel free to keep things simple and type
+the mean and standard deviation numbers into your code for this exercise.</p>
+</li>
+</ul>
+</dd>
+</dl>
+<p>Applying your classifier to the test set should produce the following
+confusion matrix:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; source(&#39;classifier2.R&#39;)
+&gt; ratios &lt;- apply(test, 1, classifier2)
+&gt; predictions &lt;- sapply(ratios, function(x) { if (x &gt;= 1.0) gt50K else lt50K})
+&gt; table(predictions, test[,&quot;salary&quot;], dnn=list(&quot;predicted&quot;, &quot;actual&quot;))
+         actual
+predicted &lt;=50K  &gt;50K
+    &lt;=50K 11555  2523
+    &gt;50K    880  1323
+</pre></div>
+</div>
+<p>Re-plot the ROC curve for the new classifier.  Does it look better?  What is the
+area under the curve now.</p>
+</div>
+<div class="section" id="optional-additional-work">
+<h2>Optional additional work<a class="headerlink" href="#optional-additional-work" title="Permalink to this headline">¶</a></h2>
+<p>Add more features to your Naive Bayes classifier. Adding categorical features
+education number, marital status, occupation, relationship, race, sex and native
+country increases the area under the ROC curve to 0.88.</p>
+<p>If you get <code class="docutils literal"><span class="pre">subscript</span> <span class="pre">out</span> <span class="pre">of</span> <span class="pre">bounds</span></code> errors when accessing the table for
+education number it could be because R is strangely adding white space. Trying
+using the following function to trim the white space:</p>
+<div class="highlight-python"><div class="highlight"><pre>trim &lt;- function( x ) {
+  gsub(&quot;(^[[:space:]]+|[[:space:]]+$)&quot;, &quot;&quot;, x)
+}
+</pre></div>
+</div>
+<p>Then read the value for education number as using:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">f</span> <span class="o">&lt;-</span> <span class="n">trim</span><span class="p">(</span><span class="n">x</span><span class="p">[[</span><span class="s">&quot;education.num&quot;</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>Of the remaining continuous features only fnlwgt fits well onto the normal distribution
+but it seems to have little difference between the low and high salary cases.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Bayes Classifier Practical</a><ul>
+<li><a class="reference internal" href="#before-you-start">Before you start</a><ul>
+<li><a class="reference internal" href="#running-r-studio">Running R studio</a></li>
+<li><a class="reference internal" href="#installing-the-packages">Installing the packages</a></li>
+<li><a class="reference internal" href="#downloading-the-files">Downloading the files</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-data-set">The data set</a></li>
+<li><a class="reference internal" href="#naive-bayes-classifier">Naive Bayes Classifier</a></li>
+<li><a class="reference internal" href="#roc-curves">ROC Curves</a></li>
+<li><a class="reference internal" href="#adding-continuous-features">Adding continuous features</a></li>
+<li><a class="reference internal" href="#optional-additional-work">Optional additional work</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">Naive Bayes Tutorial 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, The University of Edinburgh.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

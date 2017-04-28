@@ -1,0 +1,427 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Linear Regression Practical &mdash; Linear Regression Tutorial 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Linear Regression Tutorial 1.0 documentation" href="#" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">Linear Regression Tutorial 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="linear-regression-practical">
+<h1>Linear Regression Practical<a class="headerlink" href="#linear-regression-practical" title="Permalink to this headline">¶</a></h1>
+<p>This practical will explore linear and polynomial regression using R.</p>
+<div class="section" id="before-you-start">
+<h2>Before you start<a class="headerlink" href="#before-you-start" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="running-r-studio">
+<h3>Running R studio<a class="headerlink" href="#running-r-studio" title="Permalink to this headline">¶</a></h3>
+<p>This practical using R studio. Ensure that you can run R Studio.</p>
+</div>
+<div class="section" id="installing-the-packages">
+<h3>Installing the packages<a class="headerlink" href="#installing-the-packages" title="Permalink to this headline">¶</a></h3>
+<p>The practical will use a number of R packages. Before you use this packages you need to load them:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">library</span><span class="p">(</span><span class="n">shiny</span><span class="p">)</span>
+<span class="n">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
+<span class="n">library</span><span class="p">(</span><span class="n">lattice</span><span class="p">)</span>
+<span class="n">library</span><span class="p">(</span><span class="n">scatterplot3d</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Ggplot2, lattice and scatterplot3d are data visualisation and graph drawing packages. Shiny
+is a package that supports web-based user interfaces to dynamic R data analysis. We shall see this in use during the
+practical.</p>
+<p>If any of these packages fail to load then you can install them with the commands below. Please do not
+do this unless you have to as R does not check if they exist before downloading the packages and it will
+take a while to install them:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s">&quot;shiny&quot;</span><span class="p">)</span>
+<span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s">&quot;ggplot2&quot;</span><span class="p">)</span>
+<span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s">&quot;lattice&quot;</span><span class="p">)</span>
+<span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s">&quot;scatterplot3d&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="downloading-the-files">
+<h3>Downloading the files<a class="headerlink" href="#downloading-the-files" title="Permalink to this headline">¶</a></h3>
+<p>Download the practical R files and data using git:</p>
+<div class="highlight-python"><div class="highlight"><pre>git clone https://allyhume@bitbucket.org/allyhume/LinearRegressionPractical.git
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="single-variable-linear-regression">
+<h2>Single variable linear regression<a class="headerlink" href="#single-variable-linear-regression" title="Permalink to this headline">¶</a></h2>
+<p>Linear regression fits a straight line model to a database to minimise the sum of square errors
+cost function. To get a feel for this task we will try to do it by hand.</p>
+<p>In the R Studio console window set the working directory to where you downloaded the practical files:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">setwd</span><span class="p">(</span><span class="s">&quot;/PATH/TO/LinearRegressionPractical/R&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now run the linear regession Shiny application:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">runApp</span><span class="p">(</span><span class="s">&quot;LinearRegression2D&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The following browser window should appear:</p>
+<a class="reference internal image-reference" href="_images/linearRegression2D.png"><img alt="_images/linearRegression2D.png" src="_images/linearRegression2D.png" style="width: 500px;" /></a>
+<p>Here we are trying to fit a linear model to predict the weight of cats&#8217; hearts (in g) from their body weight (in kg)
+(<a class="reference external" href="http://stat.ethz.ch/R-manual/R-devel/library/boot/html/catsM.html">more details of this dataset</a>)</p>
+<p>Play with the slides on this window to change the model parameters and watch the sum of square errors cost function value change as you do so. Can you find the parameters that give the minimum score?</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>This is the basis for many machine learning techniques</p>
+<p class="last">What you have just done is the basis of many machine learning techniques. Selecting a model
+to fit the data and then deciding the parameters of that model to minimise a particular
+cost function is at the core of many machine learning techniques.</p>
+</div>
+<p>To exit the Shiny application click the Stop button in the top right hand corner of R Studo&#8217;s Console pane.</p>
+</div>
+<div class="section" id="data-exploratory-analysis">
+<h2>Data exploratory analysis<a class="headerlink" href="#data-exploratory-analysis" title="Permalink to this headline">¶</a></h2>
+<p>We will explore the public dataset mtcars. This data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973-74 models). You can view this in R:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; mtcars
+                     mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+Mazda RX4           21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
+Mazda RX4 Wag       21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
+Datsun 710          22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
+Hornet 4 Drive      21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
+...
+</pre></div>
+</div>
+<p>You can view basic descriptive statistics of this dataset using the summary command:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; summary(mtcars)
+      mpg             cyl             disp             hp             drat             wt
+ Min.   :10.40   Min.   :4.000   Min.   : 71.1   Min.   : 52.0   Min.   :2.760   Min.   :1.513
+ 1st Qu.:15.43   1st Qu.:4.000   1st Qu.:120.8   1st Qu.: 96.5   1st Qu.:3.080   1st Qu.:2.581
+ Median :19.20   Median :6.000   Median :196.3   Median :123.0   Median :3.695   Median :3.325
+ Mean   :20.09   Mean   :6.188   Mean   :230.7   Mean   :146.7   Mean   :3.597   Mean   :3.217
+ 3rd Qu.:22.80   3rd Qu.:8.000   3rd Qu.:326.0   3rd Qu.:180.0   3rd Qu.:3.920   3rd Qu.:3.610
+ Max.   :33.90   Max.   :8.000   Max.   :472.0   Max.   :335.0   Max.   :4.930   Max.   :5.424
+      qsec             vs               am              gear            carb
+ Min.   :14.50   Min.   :0.0000   Min.   :0.0000   Min.   :3.000   Min.   :1.000
+ 1st Qu.:16.89   1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:3.000   1st Qu.:2.000
+ Median :17.71   Median :0.0000   Median :0.0000   Median :4.000   Median :2.000
+ Mean   :17.85   Mean   :0.4375   Mean   :0.4062   Mean   :3.688   Mean   :2.812
+ 3rd Qu.:18.90   3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:4.000   3rd Qu.:4.000
+ Max.   :22.90   Max.   :1.0000   Max.   :1.0000   Max.   :5.000   Max.   :8.000
+</pre></div>
+</div>
+<p>What information is the above providing?</p>
+<p>You can plot all the variables against each other with a scatterplot matrix using the R command pairs:</p>
+<blockquote>
+<div>&gt; pairs(mtcars, main = &#8220;mtcars data&#8221;, pch=16)</div></blockquote>
+<p>The following image should appear:</p>
+<a class="reference internal image-reference" href="_images/matrixScatterPlot1.png"><img alt="_images/matrixScatterPlot1.png" src="_images/matrixScatterPlot1.png" style="width: 500px;" /></a>
+<p>This is a great way to roughly determine if there is any linear correlation between multiple variables. You can subset the plot to those variables that seem to have a linear correlation using the R subset command:</p>
+<blockquote>
+<div>&gt; pairs(subset(mtcars, select=c(&#8220;mpg&#8221;, &#8220;wt&#8221;, &#8220;disp&#8221;)), main = &#8220;mtcars data&#8221;, pch=16)</div></blockquote>
+<p>The following image should appear:</p>
+<a class="reference internal image-reference" href="_images/matrixScatterPlot2.png"><img alt="_images/matrixScatterPlot2.png" src="_images/matrixScatterPlot2.png" style="width: 500px;" /></a>
+</div>
+<div class="section" id="multiple-variable-linear-regression">
+<h2>Multiple variable linear regression<a class="headerlink" href="#multiple-variable-linear-regression" title="Permalink to this headline">¶</a></h2>
+<p>Now we will explore linear regression using more than one variable.</p>
+<p>Run the linear regression 3D Shiny application:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">runApp</span><span class="p">(</span><span class="s">&quot;LinearRegression3D&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The following browser window should appear:</p>
+<a class="reference internal image-reference" href="_images/linearRegression3D.png"><img alt="_images/linearRegression3D.png" src="_images/linearRegression3D.png" style="width: 500px;" /></a>
+<p>Here we are trying to predict predict the number of miles a car can drive for each gallon of
+petrol (mpg) using the weight (wt in lb/1000) of the car and its engine displacement (disp in
+cu.in.)
+(<a class="reference external" href="http://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html">more details of this dataset</a>)</p>
+<p>As you can see when two variable as used the linear model is a plane rather than a line. Again you
+can use the sliders to try to minimse the cost function.</p>
+<p>We will now try to use the matrix version of the normal equation to find the optimal parameters for
+this model. The matrix version requires to matrices X and y defined as:</p>
+<a class="reference internal image-reference" href="_images/XandY.png"><img alt="_images/XandY.png" src="_images/XandY.png" style="width: 500px;" /></a>
+<p>We will now construct these matrices on the R console so you will need to quit the Shiny application
+by clicking on the Stop button.</p>
+<p>The cars data is in a data frame called mtcars. You can view this in R:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; mtcars
+                     mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+Mazda RX4           21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
+Mazda RX4 Wag       21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
+Datsun 710          22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
+Hornet 4 Drive      21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
+...
+</pre></div>
+</div>
+<p>We wish the y matrix to the mpg values that our model will predict:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">y</span> <span class="o">&lt;-</span> <span class="n">data</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">subset</span><span class="p">(</span><span class="n">mtcars</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="n">c</span><span class="p">(</span><span class="s">&quot;mpg&quot;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">select</span></code> part of the above line specifies the names of the columns to select. Use a similar line to
+start to build the X matix with columns <code class="docutils literal"><span class="pre">wt</span></code> and <code class="docutils literal"><span class="pre">disp</span></code>.  Your aim is to have an X matrix that
+looks like:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; X
+                       wt  disp
+Mazda RX4           2.620 160.0
+Mazda RX4 Wag       2.875 160.0
+Datsun 710          2.320 108.0
+Hornet 4 Drive      3.215 258.0
+Hornet Sportabout   3.440 360.0
+Valiant             3.460 225.0
+Duster 360          3.570 360.0
+Merc 240D           3.190 146.7
+Merc 230            3.150 140.8
+Merc 280            3.440 167.6
+Merc 280C           3.440 167.6
+Merc 450SE          4.070 275.8
+Merc 450SL          3.730 275.8
+Merc 450SLC         3.780 275.8
+Cadillac Fleetwood  5.250 472.0
+Lincoln Continental 5.424 460.0
+Chrysler Imperial   5.345 440.0
+Fiat 128            2.200  78.7
+Honda Civic         1.615  75.7
+Toyota Corolla      1.835  71.1
+Toyota Corona       2.465 120.1
+Dodge Challenger    3.520 318.0
+AMC Javelin         3.435 304.0
+Camaro Z28          3.840 350.0
+Pontiac Firebird    3.845 400.0
+Fiat X1-9           1.935  79.0
+Porsche 914-2       2.140 120.3
+Lotus Europa        1.513  95.1
+Ford Pantera L      3.170 351.0
+Ferrari Dino        2.770 145.0
+Maserati Bora       3.570 301.0
+Volvo 142E          2.780 121.0
+</pre></div>
+</div>
+<p>When you have this you can now add on the column of 1s to the first column of the matrix. This is easily done in R using the cbind command:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">X</span> <span class="o">&lt;-</span> <span class="n">cbind</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We are now ready to solve for the parameters using the equation:</p>
+<a class="reference internal image-reference" href="_images/normalEquation.png"><img alt="_images/normalEquation.png" src="_images/normalEquation.png" style="width: 200px;" /></a>
+<p>Build up this equation in R. The following functions and operators will prove useful:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">A</span> <span class="pre">%*%</span> <span class="pre">B</span></code> is used for matrix multiplication</li>
+<li><code class="docutils literal"><span class="pre">t(A)</span></code> is used for the transpose of matrix A</li>
+<li><code class="docutils literal"><span class="pre">solve(A)</span></code> returns the inverse of matrix A</li>
+</ul>
+<p>Do the co-efficient returned correspond to the minium cost function score when entered to the
+Shiny application?  Test this is so by running the application again:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">runApp</span><span class="p">(</span><span class="s">&quot;linearRegression3D&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now use the co-efficients returned to predict the mpg for the Volvo 142E using the weight and
+displacement figures shown above for that vehicle.</p>
+<p>Hints:</p>
+<ul class="simple">
+<li>You can simply use matrix multiplication to multiply a vector containing the required values by
+the co-efficients matrix - remember to include the value 1 as the first value of your 3
+values vector.</li>
+<li>You can constuct your feature values vector simply by using <code class="docutils literal"><span class="pre">c(1,</span> <span class="pre">wt,</span> <span class="pre">disp)</span></code> with the
+appropriate values for <code class="docutils literal"><span class="pre">wt</span></code> and <code class="docutils literal"><span class="pre">disp</span></code>.</li>
+</ul>
+<p>The predicted value for the Volvo 142E should be 23.50057 mpg.</p>
+</div>
+<div class="section" id="multiple-variable-linear-regression-using-r-s-built-in-functions">
+<h2>Multiple variable linear regression using R&#8217;s built in functions<a class="headerlink" href="#multiple-variable-linear-regression-using-r-s-built-in-functions" title="Permalink to this headline">¶</a></h2>
+<p>R has build in functions to support linear regression. All the work we have done above and more
+can be done simply by calling:</p>
+<div class="highlight-python"><div class="highlight"><pre>model &lt;- lm(mtcars$mpg ~ mtcars$wt + mtcars$disp)
+</pre></div>
+</div>
+<p>You can look at the co-efficients returned by viewing the model:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; model
+
+Call:
+lm(formula = mtcars$mpg ~ mtcars$wt + mtcars$disp)
+
+Coefficients:
+(Intercept)    mtcars$wt  mtcars$disp
+   34.96055     -3.35083     -0.01772
+</pre></div>
+</div>
+<p>The variable <code class="docutils literal"><span class="pre">model$fitted.values</span></code> contains the values of the fitted model. The variable <code class="docutils literal"><span class="pre">model$residuals</span></code>
+contains the differences between these fitted values and the data values. Use this to calculate
+the sum of the squared errors for the model.  Is the value similar to the minimum cost shown on the
+Shiny application for these coefficients?</p>
+<p>Hint:</p>
+<ul class="simple">
+<li>the R function <code class="docutils literal"><span class="pre">sum</span></code> will sum all the values in a vector. Alternatively, the operator <code class="docutils literal"><span class="pre">%*%</span></code> performs the dot product of two vectors.</li>
+</ul>
+<p>The R command summary provides basic evaluation statistics of the fitted model, including the coefficient t-statistics, and the R-squared values:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; summary(model)
+
+Call:
+lm(formula = mtcars$mpg ~ mtcars$wt + mtcars$disp)
+
+Residuals:
+    Min      1Q  Median      3Q     Max
+-3.4087 -2.3243 -0.7683  1.7721  6.3484
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)
+(Intercept) 34.96055    2.16454  16.151 4.91e-16 ***
+mtcars$wt   -3.35082    1.16413  -2.878  0.00743 **
+mtcars$disp -0.01773    0.00919  -1.929  0.06362 .
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 2.917 on 29 degrees of freedom
+Multiple R-squared:  0.7809,    Adjusted R-squared:  0.7658
+F-statistic: 51.69 on 2 and 29 DF,  p-value: 2.744e-10
+</pre></div>
+</div>
+<p>What can we conclude from the above? Can we perform any feature selection?</p>
+</div>
+<div class="section" id="polynomial-regression">
+<h2>Polynomial regression<a class="headerlink" href="#polynomial-regression" title="Permalink to this headline">¶</a></h2>
+<p>Polynomial regression can be used to fit non-linear models to data. It uses linear regression and simply adds
+polynomial terms to the set of feature values.  Consider the following data set:</p>
+<a class="reference internal image-reference" href="_images/tortoiseScatterPlot.png"><img alt="_images/tortoiseScatterPlot.png" src="_images/tortoiseScatterPlot.png" style="width: 500px;" /></a>
+<p>Here we plot tortoise carapace (shell) length and clutch size (number of eggs). This data is from Ashton, K.G.,
+R.L. Burke, and J.N. Layne. 2007. Geographic variation in body and clutch size of gopher tortoises. Copeia 2007: 355-363.</p>
+<p>It does not look like there is an obvious linear fit to this data but let&#8217;s try to use linear regression to predict
+clutch size from length:</p>
+<div class="highlight-python"><div class="highlight"><pre>tortoise &lt;- read.csv(&#39;tortoise.csv&#39;)
+model &lt;- lm(tortoise$clutch ~ tortoise$length)
+</pre></div>
+</div>
+<p>We can now plot this data and the linear model:</p>
+<div class="highlight-python"><div class="highlight"><pre>plot(tortoise$length, tortoise$clutch)
+abline(model, col=&#39;red&#39;)
+</pre></div>
+</div>
+<p>Does this look like a great fit to the data?</p>
+<p>Use the same method as before to calculate the sum of the square errors.  It should be 186.152.</p>
+<p>Execute <code class="docutils literal"><span class="pre">summary(model)</span></code> to evaluate its statistics. What can we conclude from the R-squared statistic?</p>
+<p>Let&#8217;s see if we do better with polynomial regression without seriously overfitting the model?</p>
+<p>We will add the square of the length as an additional feature to the feature set:</p>
+<div class="highlight-python"><div class="highlight"><pre>tortoise$lengthSq &lt;- tortoise$length^2
+</pre></div>
+</div>
+<p>Now use the R <code class="docutils literal"><span class="pre">lm</span></code> function is use this additional feature in your linear regression.</p>
+<p>What is the sum of square errors cost function for this model?  It should be 106.9736.</p>
+<p>We can plot the fitted values onto the graph with lines between them to quickly show the shape of
+the new polynomial model:</p>
+<div class="highlight-python"><div class="highlight"><pre>points(tortoise$length, polynomialModel$fitted.values, type=&#39;l&#39;, col = &#39;green&#39;)
+</pre></div>
+</div>
+<p>The model does seem to capture the data better and reflects that very large tortoises tend to
+lay fewer eggs than middle sized tortoises.</p>
+<p>Execute <code class="docutils literal"><span class="pre">summary(model)</span></code> to evaluate its statistics. What can we conclude from the R-squared statistic, compared to the previous model?</p>
+</div>
+<div class="section" id="futher-work-higher-degree-polynomials">
+<h2>Futher work: Higher degree polynomials<a class="headerlink" href="#futher-work-higher-degree-polynomials" title="Permalink to this headline">¶</a></h2>
+<p>Invesitage the impact of adding higher degree polynomials (cubed, 4th power, 5th power etc)
+to the tortoise data. Does it lead to a lower cost score? Does the model look overfitted
+when plotted?  Is the decrease in cost function justified by the additional complexity
+of the model and hence the increased danger of overfitting.</p>
+</div>
+<div class="section" id="further-work-playing-with-shiny">
+<h2>Further work: Playing with Shiny<a class="headerlink" href="#further-work-playing-with-shiny" title="Permalink to this headline">¶</a></h2>
+<p>This is really only for those that are especially interested in R and have time to spare during
+the lab session...</p>
+<p>The early stages of the lab used <a class="reference external" href="http://shiny.rstudio.com/">Shiny</a> to develop the web interactive
+web apps. Each Shiny application is a directory that contains a user interface file called <code class="docutils literal"><span class="pre">ui.R</span></code>
+and a server file called <code class="docutils literal"><span class="pre">server.R</span></code>.  Look at these files in the applications here and the examples
+on the Shiny documentation and explore a bit more about the functionality.</p>
+<p>Can you write a Shiny application that uses the tortoise data and draws the fitted data line for
+whatever degree of polynomial the user selects for the model?  Don&#8217;t bother implementing slides
+for the various paramters of the model - just let the user specify the degree of polynomial and
+use the R <code class="docutils literal"><span class="pre">lm</span></code> function to fit model.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Linear Regression Practical</a><ul>
+<li><a class="reference internal" href="#before-you-start">Before you start</a><ul>
+<li><a class="reference internal" href="#running-r-studio">Running R studio</a></li>
+<li><a class="reference internal" href="#installing-the-packages">Installing the packages</a></li>
+<li><a class="reference internal" href="#downloading-the-files">Downloading the files</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#single-variable-linear-regression">Single variable linear regression</a></li>
+<li><a class="reference internal" href="#data-exploratory-analysis">Data exploratory analysis</a></li>
+<li><a class="reference internal" href="#multiple-variable-linear-regression">Multiple variable linear regression</a></li>
+<li><a class="reference internal" href="#multiple-variable-linear-regression-using-r-s-built-in-functions">Multiple variable linear regression using R&#8217;s built in functions</a></li>
+<li><a class="reference internal" href="#polynomial-regression">Polynomial regression</a></li>
+<li><a class="reference internal" href="#futher-work-higher-degree-polynomials">Futher work: Higher degree polynomials</a></li>
+<li><a class="reference internal" href="#further-work-playing-with-shiny">Further work: Playing with Shiny</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">Linear Regression Tutorial 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, The University of Edinburgh.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>
